@@ -1,0 +1,33 @@
+syntax = "proto3";
+package pb; // Nome do pacote
+option go_package = "./pb"; // Define o tipo do pacote a ser gerado
+
+// Definição do "contrato"
+message User {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    // optional string email = 3; // user.proto: This file contains proto3 optional fields, but --experimental_allow_proto3_optional was not set.
+}
+
+// server stream
+message UserResultStream {
+    string status = 1;
+    User user = 2;
+}
+
+// client stream
+message Users {
+    repeated User user = 1;
+}
+
+// Definição do serviço
+service UserService {
+    rpc AddUser (User) returns (User);
+    rpc AddUserVerbose (User) returns (stream UserResultStream);
+    rpc AddUsers (stream User) returns (Users);
+    rpc AddUserStreamBoth (stream User) returns (stream UserResultStream);
+}
+
+// Necessário compilar para gerar as stubs em Go
+// protoc --proto_path=proto/ proto/*.proto --plugin=$(go env GOPATH)/bin/protoc-gen-go-grpc --go-grpc_out=. --go_out=.
